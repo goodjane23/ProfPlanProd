@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,6 +13,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ClosedXML.Excel;
+using ControlzEx.Standard;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Spreadsheet;
 using ExcelDataReader;
 using Microsoft.Win32;
 using ProfPlanProd.Commands;
@@ -813,12 +817,18 @@ namespace ProfPlanProd.ViewModels
                             {
                                 worksheet.Cell(frow, i + 1).Value = newPropertyNames[i];
                                 worksheet.Cell(frow, i + 1).Style.Alignment.SetTextRotation(90);
+                                if (newPropertyNames[i] != "Преподаватель")
+                                    worksheet.Cell(frow, i + 1).Style.Alignment.WrapText = true;
 
                                 worksheet.Cell(rowNumberAutumn, i + 1).Value = newPropertyNames[i];
                                 worksheet.Cell(rowNumberAutumn, i + 1).Style.Alignment.SetTextRotation(90);
+                                if (newPropertyNames[i] != "Преподаватель")
+                                worksheet.Cell(rowNumberAutumn, i + 1).Style.Alignment.WrapText = true;
 
                                 worksheet.Cell(rowNumberSpring, i + 1).Value = newPropertyNames[i];
                                 worksheet.Cell(rowNumberSpring, i + 1).Style.Alignment.SetTextRotation(90);
+                                if (newPropertyNames[i] != "Преподаватель")
+                                worksheet.Cell(rowNumberSpring, i + 1).Style.Alignment.WrapText = true;
                             }
                         }
                     }
@@ -828,7 +838,7 @@ namespace ProfPlanProd.ViewModels
                         {
 
                             worksheet.Columns(2, 3).AdjustToContents(4, 4);
-                            worksheet.Rows().AdjustToContents();
+                            //worksheet.Rows().AdjustToContents();
                         }
                     }
                     SaveWorkbook(workbook);
@@ -907,7 +917,7 @@ namespace ProfPlanProd.ViewModels
         {
             int rowNumber = (table.Tablename.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) != -1 || table.Tablename.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) != -1) ? 2 : 3;
             int columnNumber = 1;
-
+            int indprop = 27;
             foreach (var data in table.ExcelDataList)
             {
                 foreach (var propertyName in GetPropertyNames(data))
@@ -917,15 +927,39 @@ namespace ProfPlanProd.ViewModels
                     worksheet.Cell(rowNumber, columnNumber).Style.Border.RightBorder = XLBorderStyleValues.Thin;
                     worksheet.Cell(rowNumber, columnNumber).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
                     var value = data.GetType().GetProperty(propertyName)?.GetValue(data, null);
-                    worksheet.Cell(rowNumber, columnNumber).Value = value != null ? value.ToString() : "";
+                    if(value != null)
+                    {
+                        if (int.TryParse(value.ToString(), out int val))
+                            worksheet.Cell(rowNumber, columnNumber).Value = val;
+                        else if (double.TryParse(value.ToString(), out double vald))
+                            worksheet.Cell(rowNumber, columnNumber).Value = vald;
+                        else
+                            worksheet.Cell(rowNumber, columnNumber).Value = value.ToString();
+                    }
+                    else
+                    {
+                        worksheet.Cell(rowNumber, columnNumber).Value ="";
+                    }
                     columnNumber++;
                 }
 
                 rowNumber++;
                 columnNumber = 1;
             }
-            if(table.Tablename.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) == -1 && table.Tablename.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) == -1)
+           
+
+            if (table.Tablename.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) == -1 && table.Tablename.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) == -1)
             {
+                double sum = 0;
+                foreach (ExcelModel excelModel in table.ExcelDataList)
+                {
+                    sum+=excelModel.Total.ToNullable<double>() ?? 0;
+                }
+                worksheet.Cell(rowNumber, indprop - 2).Value = "Итого";
+                worksheet.Cell(rowNumber, indprop).Value = sum;
+                worksheet.Cell(rowNumber, indprop - 2).Style.Font.SetBold(true);
+                worksheet.Cell(rowNumber, indprop).Style.Font.SetBold(true);
+
                 rowNumber = table.ExcelDataList.Count() + 8;
                int  rowNumberCh = table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 15;
                 foreach (var data in table.ExcelDataList)
@@ -939,7 +973,19 @@ namespace ProfPlanProd.ViewModels
                             worksheet.Cell(rowNumber, columnNumber).Style.Border.RightBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowNumber, columnNumber).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
                             var value = data.GetType().GetProperty(propertyName)?.GetValue(data, null);
-                            worksheet.Cell(rowNumber, columnNumber).Value = value != null ? value.ToString() : "";
+                            if (value != null)
+                            {
+                                if (int.TryParse(value.ToString(), out int val))
+                                    worksheet.Cell(rowNumber, columnNumber).Value = val;
+                                else if (double.TryParse(value.ToString(), out double vald))
+                                    worksheet.Cell(rowNumber, columnNumber).Value = vald;
+                                else
+                                    worksheet.Cell(rowNumber, columnNumber).Value = value.ToString();
+                            }
+                            else
+                            {
+                                worksheet.Cell(rowNumber, columnNumber).Value ="";
+                            }
                             columnNumber++;
                         }
                         rowNumber++;
@@ -954,13 +1000,43 @@ namespace ProfPlanProd.ViewModels
                             worksheet.Cell(rowNumberCh, columnNumber).Style.Border.RightBorder = XLBorderStyleValues.Thin;
                             worksheet.Cell(rowNumberCh, columnNumber).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
                             var value = data.GetType().GetProperty(propertyName)?.GetValue(data, null);
-                            worksheet.Cell(rowNumberCh, columnNumber).Value = value != null ? value.ToString() : "";
+                            if (value != null)
+                            {
+                                if (int.TryParse(value.ToString(), out int val))
+                                    worksheet.Cell(rowNumberCh, columnNumber).Value = val;
+                                else if (double.TryParse(value.ToString(), out double vald))
+                                    worksheet.Cell(rowNumberCh, columnNumber).Value = vald;
+                                else
+                                    worksheet.Cell(rowNumberCh, columnNumber).Value = value.ToString();
+                            }
+                            else
+                            {
+                                worksheet.Cell(rowNumberCh, columnNumber).Value ="";
+                            }
                             columnNumber++;
                         }
                         rowNumberCh++;
                         columnNumber = 1;
                     }
                 }
+                sum=0;
+                foreach (ExcelModel excelModel in table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1))
+                {
+                    sum+=excelModel.Total.ToNullable<double>() ?? 0;
+                }
+                worksheet.Cell(rowNumber, indprop - 2).Value = "Итого";
+                worksheet.Cell(rowNumber, indprop).Value = sum;
+                worksheet.Cell(rowNumber, indprop - 2).Style.Font.SetBold(true);
+                worksheet.Cell(rowNumber, indprop).Style.Font.SetBold(true);
+                sum=0;
+                foreach (ExcelModel excelModel in table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) == -1))
+                {
+                    sum+=excelModel.Total.ToNullable<double>() ?? 0;
+                }
+                worksheet.Cell(rowNumberCh, indprop - 2).Value = "Итого";
+                worksheet.Cell(rowNumberCh, indprop).Value = sum;
+                worksheet.Cell(rowNumberCh, indprop - 2).Style.Font.SetBold(true);
+                worksheet.Cell(rowNumberCh, indprop).Style.Font.SetBold(true);
             }
 
         }
