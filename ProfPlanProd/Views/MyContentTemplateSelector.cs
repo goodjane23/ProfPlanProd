@@ -22,10 +22,10 @@ namespace ProfPlanProd.Views
             {
                 return FirstTemplate;
             }
-            //else if (tableCollection.Tablename.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) != -1)
-            //{
-            //    return ThirdTemplate;
-            //}
+            else if (tableCollection.Tablename.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) != -1)
+            {
+                return ThirdTemplate;
+            }
             else
             {
                 return SecondTemplate;

@@ -177,7 +177,8 @@
             </ResourceDictionary.MergedDictionaries>
             <views:MyContentTemplateSelector x:Key="MyContentTemplateSelector"
                 FirstTemplate="{StaticResource FirstTemplate}" 
-                SecondTemplate="{StaticResource SecondTemplate}"/>
+                SecondTemplate="{StaticResource SecondTemplate}"
+                ThirdTemplate="{StaticResource ThirdTemplate}"/>
             <views:TabStripPlacementConverter x:Key="TabStripPlacementConverter"
             TopTemplate="{StaticResource TopTemplate}" 
                     BottomTemplate="{StaticResource BottomTemplate}" 

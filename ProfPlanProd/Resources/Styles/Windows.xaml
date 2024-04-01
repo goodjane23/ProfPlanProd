@@ -82,6 +82,22 @@ ItemsSource="{Binding Teachers}"/>
         </DataGrid>
     </DataTemplate>
 
+    <DataTemplate  x:Key="ThirdTemplate" >
+        <DataGrid ItemsSource="{Binding ExcelDataList}" Language="ru-RU" AutoGenerateColumns="False" VirtualizingPanel.IsVirtualizing="True" CanUserAddRows="False" >
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderThickness" Value="0.2"/>
+                    <Setter Property="BorderBrush" Value="Black"/>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ФИО" Binding="{Binding TeacherA, TargetNullValue='',Mode=TwoWay}" />
+                <DataGridTextColumn Header="Вид работы" Binding="{Binding TypeOfWork, TargetNullValue='',Mode=TwoWay}" />
+                <DataGridTextColumn Header="Часов" Binding="{Binding TotalHours, TargetNullValue='',Mode=TwoWay}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DataTemplate>
+
 
     <ControlTemplate TargetType="TabControl" x:Key="TopTemplate">
         <Grid>

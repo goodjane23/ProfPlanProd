@@ -147,6 +147,7 @@
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -171,6 +172,7 @@
     <Compile Include="AttachedProperties\SynchronizationManager.cs" />
     <Compile Include="AttachedProperties\TwoListSynchronizer.cs" />
     <Compile Include="Converters\IListItemConverter.cs" />
+    <Compile Include="Models\ExcelAdditional.cs" />
     <Compile Include="Models\Teacher.cs" />
     <Compile Include="Views\MultipleChoiceFilter.cs" />
     <Compile Include="Views\MyContentTemplateSelector.cs" />
