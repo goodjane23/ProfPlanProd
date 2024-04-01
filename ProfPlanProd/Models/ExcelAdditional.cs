@@ -9,8 +9,8 @@ namespace ProfPlanProd.Models
     internal class ExcelAdditional : ExcelData
     {
         public string TeacherA { get; set; }
-        public double? TotalHours { get; set; }
         public string TypeOfWork { get; set; }
+        public double? TotalHours { get; set; }
         public ExcelAdditional(string teacher, string typeOfWork, double? totalHours)
         {
             TeacherA=teacher;

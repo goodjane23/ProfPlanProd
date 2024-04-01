@@ -9,13 +9,7 @@ namespace ProfPlanProd.Models
     internal class ExcelTotal : ExcelData
     {
         public string Teacher { get; set; }
-        public double? BetPercent { get; set; }
-        public double? AutumnHours { get; set; }
-        public double? SpringHours { get; set; }
-        private double? _difference;
-        private double? _totalHours;
         private double? _bet;
-
         public double? Bet
         {
             get { return _bet; }
@@ -36,7 +30,27 @@ namespace ProfPlanProd.Models
                 }
             }
         }
-
+        public double? BetPercent { get; set; }
+        public double? AutumnHours { get; set; }
+        public double? SpringHours { get; set; }
+        private double? _difference;
+        public double? Difference
+        {
+            get { return _difference; }
+            set
+            {
+                if (_difference != value)
+                {
+                    if (value != 0)
+                    {
+                        _difference = value;
+                    }
+                    else _difference = null;
+                    OnPropertyChanged(nameof(Difference));
+                }
+            }
+        }
+        private double? _totalHours;
         public double? TotalHours
         {
             get { return _totalHours; }
@@ -58,22 +72,7 @@ namespace ProfPlanProd.Models
             }
         }
 
-        public double? Difference
-        {
-            get { return _difference; }
-            set
-            {
-                if (_difference != value)
-                {
-                    if (value != 0)
-                    {
-                        _difference = value;
-                    }
-                    else _difference = null;
-                    OnPropertyChanged(nameof(Difference));
-                }
-            }
-        }
+       
 
         public ExcelTotal() { }
         public ExcelTotal(string techer, double? bet, double? betpercent, double? total, double? autumnhours, double? springHours, double? difference)

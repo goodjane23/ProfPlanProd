@@ -749,6 +749,8 @@ namespace ProfPlanProd.ViewModels
                 {
                     foreach (var table in tablesCollection)
                     {
+                        int rowNumberAutumn = table.ExcelDataList.Count + 6;
+                        int rowNumberSpring = table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 13;
                         var worksheet = CreateWorksheet(workbook, table);
                         PopulateWorksheet(worksheet, table);
                         if (table.Tablename.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) == -1 && worksheet.Name.IndexOf("ПИиИС", StringComparison.OrdinalIgnoreCase) == -1 && worksheet.Name.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) == -1)
@@ -760,6 +762,14 @@ namespace ProfPlanProd.ViewModels
                             worksheet.Cell(1, 5).Value = "Всего";
                             worksheet.Cell(1, 5).Style.Font.SetFontSize(14);
                             worksheet.Cell(1, 5).Style.Font.SetBold(true);
+                            //
+                            worksheet.Cell(rowNumberAutumn, 2).Value = "Осень";
+                            worksheet.Cell(rowNumberAutumn, 2).Style.Font.SetFontSize(14);
+                            worksheet.Cell(rowNumberAutumn, 2).Style.Font.SetBold(true);
+
+                            worksheet.Cell(rowNumberSpring, 2).Value = "Весна";
+                            worksheet.Cell(rowNumberSpring, 2).Style.Font.SetFontSize(14);
+                            worksheet.Cell(rowNumberSpring, 2).Style.Font.SetBold(true);
                         }
                     }
                     int frow = 2;
@@ -794,10 +804,21 @@ namespace ProfPlanProd.ViewModels
                         }
                         else
                         {
+
+                            int rowNumberAutumn = TablesCollections.GetTablesCollection()[TablesCollections.GetTableIndexByName(worksheet.Name)].ExcelDataList.Count + 7;
+                            int rowNumberSpring = TablesCollections.GetTablesCollection()[TablesCollections.GetTableIndexByName(worksheet.Name)].ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + rowNumberAutumn + 7;
+
+
                             for (int i = 0; i < newPropertyNames.Count; i++)
                             {
                                 worksheet.Cell(frow, i + 1).Value = newPropertyNames[i];
                                 worksheet.Cell(frow, i + 1).Style.Alignment.SetTextRotation(90);
+
+                                worksheet.Cell(rowNumberAutumn, i + 1).Value = newPropertyNames[i];
+                                worksheet.Cell(rowNumberAutumn, i + 1).Style.Alignment.SetTextRotation(90);
+
+                                worksheet.Cell(rowNumberSpring, i + 1).Value = newPropertyNames[i];
+                                worksheet.Cell(rowNumberSpring, i + 1).Style.Alignment.SetTextRotation(90);
                             }
                         }
                     }
@@ -826,6 +847,8 @@ namespace ProfPlanProd.ViewModels
             else if (table.Tablename.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) == -1)
             {
                 CreateModelHeaders(worksheet);
+                CreateModelHeaders(worksheet, table.ExcelDataList.Count + 7);
+                CreateModelHeaders(worksheet, table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 14);
             }
             else
             {
@@ -863,18 +886,18 @@ namespace ProfPlanProd.ViewModels
             }
         }
 
-        private void CreateModelHeaders(IXLWorksheet worksheet)
+        private void CreateModelHeaders(IXLWorksheet worksheet, int rowNumber = 2)
         {
             int columnNumber = 1;
             foreach (var propertyInfo in typeof(ExcelModel).GetProperties())
             {
-                worksheet.Cell(2, columnNumber).Style.Border.TopBorder = XLBorderStyleValues.Thin;
-                worksheet.Cell(2, columnNumber).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
-                worksheet.Cell(2, columnNumber).Style.Border.RightBorder = XLBorderStyleValues.Thin;
-                worksheet.Cell(2, columnNumber).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                worksheet.Cell(rowNumber, columnNumber).Style.Border.TopBorder = XLBorderStyleValues.Thin;
+                worksheet.Cell(rowNumber, columnNumber).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+                worksheet.Cell(rowNumber, columnNumber).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                worksheet.Cell(rowNumber, columnNumber).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
                 if (propertyInfo.Name != "Teachers")
                 {
-                    worksheet.Cell(2, columnNumber).Value = propertyInfo.Name;
+                    worksheet.Cell(rowNumber, columnNumber).Value = propertyInfo.Name;
                     columnNumber++;
                 }
             }
@@ -900,6 +923,44 @@ namespace ProfPlanProd.ViewModels
 
                 rowNumber++;
                 columnNumber = 1;
+            }
+            if(table.Tablename.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) == -1 && table.Tablename.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) == -1)
+            {
+                rowNumber = table.ExcelDataList.Count() + 8;
+               int  rowNumberCh = table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 15;
+                foreach (var data in table.ExcelDataList)
+                {
+                    if (data.GetTermValue()!="unnull" && data.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1)
+                    {
+                        foreach (var propertyName in GetPropertyNames(data))
+                        {
+                            worksheet.Cell(rowNumber, columnNumber).Style.Border.TopBorder = XLBorderStyleValues.Thin;
+                            worksheet.Cell(rowNumber, columnNumber).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+                            worksheet.Cell(rowNumber, columnNumber).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                            worksheet.Cell(rowNumber, columnNumber).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                            var value = data.GetType().GetProperty(propertyName)?.GetValue(data, null);
+                            worksheet.Cell(rowNumber, columnNumber).Value = value != null ? value.ToString() : "";
+                            columnNumber++;
+                        }
+                        rowNumber++;
+                        columnNumber = 1;
+                    }
+                    else
+                    {
+                        foreach (var propertyName in GetPropertyNames(data))
+                        {
+                            worksheet.Cell(rowNumberCh, columnNumber).Style.Border.TopBorder = XLBorderStyleValues.Thin;
+                            worksheet.Cell(rowNumberCh, columnNumber).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+                            worksheet.Cell(rowNumberCh, columnNumber).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+                            worksheet.Cell(rowNumberCh, columnNumber).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                            var value = data.GetType().GetProperty(propertyName)?.GetValue(data, null);
+                            worksheet.Cell(rowNumberCh, columnNumber).Value = value != null ? value.ToString() : "";
+                            columnNumber++;
+                        }
+                        rowNumberCh++;
+                        columnNumber = 1;
+                    }
+                }
             }
 
         }
