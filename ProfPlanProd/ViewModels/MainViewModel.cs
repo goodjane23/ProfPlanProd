@@ -30,9 +30,12 @@ namespace ProfPlanProd.ViewModels
         public MainViewModel() { }
 
         private string filePath = "";
+        private string tempFilePath = "";
         private int Number = 1;
         private DataTableCollection tableCollection;
-
+        /// <summary>
+        /// Вкладка Файл 
+        /// </summary>
         #region OpenFileCommand
         private RelayCommand _loadDataCommand;
 
@@ -340,10 +343,10 @@ namespace ProfPlanProd.ViewModels
         {
             try
             {
-                filePath = GetExcelFilePath();
-                if (!string.IsNullOrEmpty(filePath))
+                tempFilePath = GetExcelFilePath();
+                if (!string.IsNullOrEmpty(tempFilePath))
                 {
-                    tableCollection = ReadExcelData(filePath).Tables;
+                    tableCollection = ReadExcelData(tempFilePath).Tables;
 
                     if (tableCollection.Count == 1)
                     {
@@ -711,19 +714,37 @@ namespace ProfPlanProd.ViewModels
 
         #region Save
         private RelayCommand _saveDataToExcelAs;
+        private RelayCommand _saveDataToExcel;
 
         public ICommand SaveDataAsCommand
         {
             get { return _saveDataToExcelAs ?? (_saveDataToExcelAs = new RelayCommand(SaveToExcelAs)); }
         }
 
+        public ICommand SaveDataCommand
+        {
+            get { return _saveDataToExcel ?? (_saveDataToExcel = new RelayCommand(SaveToExcel)); }
+        }
+
+        private void SaveToExcel(object parameter)
+        {
+            if (filePath.EndsWith(".xls", StringComparison.OrdinalIgnoreCase) == true || filePath == "")
+                SaveToExcelAsAsync();
+            else
+                SaveToExcelAsync();
+        }
+        private async Task SaveToExcelAsync()
+        {
+            await Task.Run(() =>
+            SaveToExcels(TablesCollections.GetTablesCollection()));
+        }
 
         private void SaveToExcelAs(object parameter)
         {
-            SaveToExcelAs();
+            SaveToExcelAsAsync();
         }
 
-        private async Task SaveToExcelAs()
+        private async Task SaveToExcelAsAsync()
         {
             System.Windows.Forms.SaveFileDialog saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             saveFileDialog.Filter = "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*";
@@ -741,8 +762,7 @@ namespace ProfPlanProd.ViewModels
             {
                 return;
             }
-            await Task.Run(() =>
-            SaveToExcels(TablesCollections.GetTablesCollection()));
+            SaveToExcelAsync();
         }
 
         private async Task SaveToExcels(ObservableCollection<TableCollection> tablesCollection)
@@ -1053,6 +1073,237 @@ namespace ProfPlanProd.ViewModels
         private void SaveWorkbook(XLWorkbook workbook)
         {
             workbook.SaveAs(filePath);
+        }
+        #endregion
+
+        /// <summary>
+        /// Вкладка Таблица
+        /// </summary>
+
+        #region Clear table
+        private RelayCommand _clearTableCommand;
+
+        public ICommand ClearTableCommand
+        {
+            get { return _clearTableCommand ?? (_clearTableCommand = new RelayCommand(ClearTable)); }
+        }
+        private void ClearTable(object parameter)
+        {
+            try
+            {
+                if (SelectedTable != null && SelectedComboBoxIndex != -1)
+                {
+                    TablesCollections.RemoveTableAtIndex(TablesCollections.GetTableIndexByName(SelectedTable.Tablename, SelectedComboBoxIndex));
+                    UpdateListBoxItemsSource();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        #endregion
+
+
+        #region Move Teachers from Plan to Fact
+        private RelayCommand _moveTeachersCommand;
+
+        public ICommand MoveTeachersCommand
+        {
+            get { return _moveTeachersCommand ?? (_moveTeachersCommand = new RelayCommand(MoveTeachers)); }
+        }
+
+        private void MoveTeachers(object parameter)
+        {
+            try
+            {
+                int ftableindex = TablesCollections.GetTableIndexByName("П_ПИиИС", SelectedComboBoxIndex);
+                int stableindex = TablesCollections.GetTableIndexByName("Ф_ПИиИС", SelectedComboBoxIndex);
+                if (ftableindex != -1 && stableindex != -1)
+                {
+                    try
+                    {
+                        if (TablesCollections.GetTablesCollection()[stableindex].ExcelDataList.Count != 0)
+                        {
+                            for (int i = 0; i < TablesCollections.GetTablesCollection()[stableindex].ExcelDataList.Count; i++)
+                            {
+                                if (TablesCollections.GetTablesCollection()[stableindex].ExcelDataList[i] is ExcelModel excelModel && excelModel.Teacher == "")
+                                {
+                                    ExcelModel stableData = TablesCollections.GetTablesCollection()[stableindex].ExcelDataList[i] as ExcelModel;
+                                    ExcelModel ftableData = TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList[i] as ExcelModel;
+
+                                    if (stableData != null && ftableData != null &&
+                                        stableData.Term == ftableData.Term &&
+                                        stableData.Group == ftableData.Group &&
+                                        stableData.Institute == ftableData.Institute &&
+                                        stableData.FormOfStudy == ftableData.FormOfStudy &&
+                                        ftableData.Teacher != "")
+                                    {
+                                        stableData.Teacher = ftableData.Teacher;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Лист Факт пустой! Поэтому данные с листа План были скопированы");
+                            CreateTableCollectionsForMove();
+                            ftableindex = TablesCollections.GetTableIndexByName("П_ПИиИС", SelectedComboBoxIndex);
+                            stableindex = TablesCollections.GetTableIndexByName("Ф_ПИиИС", SelectedComboBoxIndex);
+                            for (int i = 0; i < TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList.Count; i++)
+                            {
+                                ExcelModel ftableData = TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList[i] as ExcelModel;
+                                TablesCollections.AddByIndex(stableindex, ftableData);
+                            }
+                        }
+
+                    }
+                    catch
+                    {
+
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Лист Факт пустой! Поэтому данные с листа План были скопированы");
+                    CreateTableCollectionsForMove();
+                    ftableindex = TablesCollections.GetTableIndexByName("П_ПИиИС", SelectedComboBoxIndex);
+                    stableindex = TablesCollections.GetTableIndexByName("Ф_ПИиИС", SelectedComboBoxIndex);
+                    for (int i = 0; i < TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList.Count; i++)
+                    {
+                        ExcelModel ftableData = TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList[i] as ExcelModel;
+                        TablesCollections.AddByIndex(stableindex, ftableData);
+                    }
+                }
+                if (SelectedComboBoxIndex==0 && TablesCollections.GetTablesCollectionWithP().Count()>0)
+                    SelectedTable = TablesCollections.GetTablesCollectionWithP()[0];
+                else if (SelectedComboBoxIndex==1 && TablesCollections.GetTablesCollectionWithF().Count()>0)
+                    SelectedTable = TablesCollections.GetTablesCollectionWithF()[0];
+                else
+                    SelectedTable = null;
+                UpdateListBoxItemsSource();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        private void CreateTableCollectionsForMove()
+        {
+            if (TablesCollections.GetTableByName("П_ПИиИС", 0) == false)
+            {
+                TablesCollections.Add(new TableCollection() { Tablename = "П_ПИиИС" });
+            }
+            if (TablesCollections.GetTableByName("Ф_ПИиИС", 1) == false)
+            {
+                TablesCollections.Add(new TableCollection() { Tablename = "Ф_ПИиИС" });
+            }
+            UpdateListBoxItemsSource();
+        }
+        #endregion
+
+
+        #region Generate Teachers lists
+        private RelayCommand _generateTeachersLists;
+
+        public ICommand GenerateTeachersListsCommand
+        {
+            get { return _generateTeachersLists ?? (_generateTeachersLists = new RelayCommand(GenerateTeacher)); }
+        }
+
+        private void GenerateTeacher(object parameter)
+        {
+            try
+            {
+                GenerateTeacherAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        private async Task GenerateTeacherAsync()
+        {
+            await Task.Run(() =>
+            {
+                if (SelectedComboBoxIndex != -1 && TablesCollections.GetTableIndexForGenerate("ПИиИС", SelectedComboBoxIndex) != -1)
+                {
+                    string prefix;
+                    if (SelectedComboBoxIndex == 0)
+                    {
+                        prefix = "П_";
+                    }
+                    else
+                    {
+                        prefix = "Ф_";
+                    }
+                    int mainList = TablesCollections.GetTableIndexByName(prefix + "ПИиИС", SelectedComboBoxIndex);
+                    var uniqueTeachers = TablesCollections.GetTablesCollection()[mainList].ExcelDataList
+                   .Where(data => data is ExcelModel) // Фильтрация по типу ExcelModel
+                   .Select(data => ((ExcelModel)data).Teacher) // Приведение к ExcelModel и выбор Teacher
+                   .Distinct()
+                   .ToList();
+                    ObservableCollection<ExcelData> totallist = new ObservableCollection<ExcelData>();
+                    foreach (var teacher in uniqueTeachers)
+                    {
+                        var teacherTableCollection = new TableCollection() { };
+
+                        if (teacher.ToString() != "")
+                            teacherTableCollection = new TableCollection(prefix+teacher.ToString().Split(' ')[0]);
+                        else
+                            teacherTableCollection = new TableCollection(prefix+"Незаполненные");
+                        var teacherRows = TablesCollections.GetTablesCollection()[mainList].ExcelDataList
+                        .Where(data => data is ExcelModel && ((ExcelModel)data).Teacher == teacher)
+                        .ToList();
+                        foreach (ExcelModel techrow in teacherRows)
+                        {
+                            techrow.PropertyChanged += teacherTableCollection.ExcelModel_PropertyChanged;
+                            teacherTableCollection.ExcelDataList.Add(techrow);
+
+                        }
+                        teacherTableCollection.SubscribeToExcelDataChanges();
+                        TablesCollections.Add(teacherTableCollection);
+
+                        //Реализация листа Итого:
+
+                        double? bet = null;
+                        string lname, fname, mname;
+                        if (teacherTableCollection.Tablename != prefix + "Незаполненные")
+                        {
+                            foreach (Teacher teach in TeachersManager.GetTeachers())
+                            {
+                                lname=teach.LastName;
+                                fname=teach.FirstName;
+                                mname=teach.MiddleName;
+                                if ($"{lname} {fname[0]}.{mname[0]}." == teacher)
+                                {
+                                    bet = teach.Workload;
+                                }
+
+                            }
+                            totallist.Add(new ExcelTotal(
+                            teacher.IndexOf(' ') != -1 ? teacher.Substring(0, teacher.IndexOf(' ')) : teacher,
+                                bet,
+                            null,
+                                teacherTableCollection.TotalHours,
+                               teacherTableCollection.AutumnHours,
+                               teacherTableCollection.SpringHours,
+                                null)
+                                );
+
+                        }
+                    }
+                    string tabname = prefix + "Итого";
+                    foreach (ExcelTotal list in totallist)
+                    {
+                        list.DifferenceCalc();
+                    }
+                    TablesCollections.Add(new TableCollection(tabname, totallist));
+                    TablesCollections.Add(new TableCollection("Доп", new ObservableCollection<ExcelData>() { new ExcelAdditional() }));
+                    TablesCollections.SortTablesCollection();
+                    UpdateListBoxItemsSource();
+                }
+            });
         }
         #endregion
     }

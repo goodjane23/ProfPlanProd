@@ -45,6 +45,7 @@
                 <MenuItem Header="Сохранить"
                           FontSize="14" 
                           HorizontalAlignment="Left"
+                          Command="{Binding SaveDataCommand}"
                           />
                 <MenuItem Header="Сохранить как"
                           FontSize="14" 
@@ -61,14 +62,17 @@
                 <MenuItem Header="Очистить таблицу" 
                           FontSize="14" 
                           HorizontalAlignment="Left" 
+                          Command="{Binding ClearTableCommand}"
                           />
                 <MenuItem Header="Перенести преподавателей" 
                           FontSize="14" 
                           HorizontalAlignment="Left" 
+                          Command="{Binding MoveTeachersCommand}"
                           />
                 <MenuItem Header="Сгенерировать листы" 
                           FontSize="14" 
                           HorizontalAlignment="Left" 
+                          Command="{Binding GenerateTeachersListsCommand}"
                           />
             </MenuItem>
             <MenuItem Header="Преподаватели" HorizontalAlignment="Left" FontSize="16">

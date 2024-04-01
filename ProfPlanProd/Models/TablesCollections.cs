@@ -136,5 +136,50 @@ namespace ProfPlanProd.Models
             }
         }
 
+        public static void RemoveTableAtIndex(int index)
+        {
+            if (index >= 0 && index < TablesCollection.Count)
+            {
+                TablesCollection[index].ExcelDataList.Clear();
+            }
+        }
+
+        public static void AddByIndex(int index, ExcelData tab)
+        {
+            TablesCollection[index].ExcelDataList.Add(tab);
+        }
+
+        public static int GetTableIndexForGenerate(string tableName, int selectedIndex)
+        {
+
+            if (selectedIndex == -1)
+            {
+                return -1; 
+            }
+            if (selectedIndex == 0)
+            {
+                for (int i = 0; i < TablesCollections.GetTablesCollectionWithP().Count; i++)
+                {
+                    if (TablesCollections.GetTablesCollectionWithP()[i].Tablename.IndexOf(tableName, StringComparison.OrdinalIgnoreCase) != -1)
+                    {
+                        return i; 
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < TablesCollections.GetTablesCollectionWithF().Count; i++)
+                {
+                    if (TablesCollections.GetTablesCollectionWithF()[i].Tablename.IndexOf(tableName, StringComparison.OrdinalIgnoreCase) != -1)
+                    {
+                        return i; 
+                    }
+                }
+            }
+
+            return -1;
+
+        }
+
     }
 }

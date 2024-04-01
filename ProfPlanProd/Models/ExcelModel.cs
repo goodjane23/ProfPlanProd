@@ -156,5 +156,21 @@ namespace ProfPlanProd.Models
         {
             return new IndividualPlan(Discipline, GetTypeOfWork(), Term, Group, GroupCount, SubGroup, $"СГУГиТ ({Institute})", Total);
         }
+
+        public static void UpdateSharedTeachers()
+        {
+            sharedTeachers.Clear();
+            string lname, fname, mname;
+            foreach (var teacher in TeachersManager.GetTeachers())
+            {
+                lname=teacher.LastName;
+                fname=teacher.FirstName;
+                mname=teacher.MiddleName;
+                if (mname.Length > 0)
+                    sharedTeachers.Add($"{lname} {fname[0]}.{mname[0]}.");
+                else
+                    sharedTeachers.Add($"{lname} {fname[0]}.");
+            }
+        }
     }
 }
