@@ -1,0 +1,150 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:dgv="urn:tom-englert.de/DataGridExtensions"
+                    xmlns:views="clr-namespace:ProfPlanProd.Views"
+                    xmlns:ap="clr-namespace:ProfPlanProd.AttachedProperties">
+
+    <ControlTemplate x:Key="MultipleChoiceFilter">
+        <views:MultipleChoiceFilter />
+    </ControlTemplate>
+
+    
+    <DataTemplate x:Key="FirstTemplate" >
+        <DataGrid ItemsSource="{Binding ExcelDataList}" Language="ru-RU" dgv:DataGridFilter.IsAutoFilterEnabled="True" 
+                  AutoGenerateColumns="False" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.CacheLength="25" 
+                  VirtualizingPanel.CacheLengthUnit="Item"  VirtualizingPanel.VirtualizationMode="Recycling" CanUserAddRows="False"  
+                  ap:MultiSelectorBehaviours.SynchronizedSelectedItems="{Binding DataContext.SelectedItems, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}">
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderThickness" Value="0.2"/>
+                    <Setter Property="BorderBrush" Value="Black"/>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="№" Binding="{Binding Number}" IsReadOnly="True" dgv:DataGridFilterColumn.IsFilterVisible="False"/>
+                <DataGridTemplateColumn Header="Преподаватель" dgv:DataGridFilterColumn.IsFilterVisible="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox IsEditable="True" 
+Text="{Binding Teacher, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+ItemsSource="{Binding Teachers}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Дисциплина" Binding="{Binding Discipline, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Семестр" Binding="{Binding Term, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Группа" Binding="{Binding Group, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Институт" Binding="{Binding Institute, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Число групп" Binding="{Binding GroupCount, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Подгруппа" Binding="{Binding SubGroup, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Форма обучения" Binding="{Binding FormOfStudy, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Число студентов" Binding="{Binding StudentsCount, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Из них комерч." Binding="{Binding CommercicalStudentsCount, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Недель" Binding="{Binding Weeks, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Форма отчетности" Binding="{Binding ReportingForm, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Лекции" Binding="{Binding Lectures, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Практики" Binding="{Binding Practices, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Лабораторные" Binding="{Binding Laboratory, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Консультации" Binding="{Binding Consultations, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Зачеты" Binding="{Binding Tests, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Экзамены" Binding="{Binding Exams, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Курсовые работы" Binding="{Binding CourseWorks, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Курсовые проекты" Binding="{Binding CourseProjects, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="ГЭК+Прием ГЭК, прием ГАК" Binding="{Binding GEKAndGAK, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Диплом" Binding="{Binding Diploma, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="РГЗ_Реф, нормоконтроль" Binding="{Binding RGZ, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="ПрактикаРабота, реценз диплом" Binding="{Binding ReviewDiploma, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Прочее" Binding="{Binding Other, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Всего" Binding="{Binding Total, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Бюджетные" Binding="{Binding Budget, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+                <DataGridTextColumn Header="Коммерческие" Binding="{Binding Commercial, TargetNullValue=''}" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DataTemplate>
+
+    <DataTemplate  x:Key="SecondTemplate" >
+        <DataGrid ItemsSource="{Binding ExcelDataList}" Language="ru-RU" AutoGenerateColumns="False" VirtualizingPanel.IsVirtualizing="True" CanUserAddRows="False" >
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderThickness" Value="0.2"/>
+                    <Setter Property="BorderBrush" Value="Black"/>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ФИО" Binding="{Binding Teacher, TargetNullValue=''}" />
+                <DataGridTextColumn Header="Ставка" Binding="{Binding Bet, TargetNullValue=''}" />
+                <DataGridTextColumn Header="Ставка (%)" Binding="{Binding BetPercent, TargetNullValue=''}" />
+                <DataGridTextColumn Header="Всего" Binding="{Binding TotalHours, TargetNullValue=''}" />
+                <DataGridTextColumn Header="Осень" Binding="{Binding AutumnHours, TargetNullValue=''}" />
+                <DataGridTextColumn Header="Весна" Binding="{Binding SpringHours, TargetNullValue=''}" />
+                <DataGridTextColumn Header="Разница" Binding="{Binding Difference, TargetNullValue=''}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DataTemplate>
+
+
+    <ControlTemplate TargetType="TabControl" x:Key="TopTemplate">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <TabPanel x:Name="HeaderPanel" Panel.ZIndex="1" KeyboardNavigation.TabIndex="1" Grid.Column="0" IsItemsHost="true"/>
+            </ScrollViewer>
+            <ContentPresenter Grid.Row="1" ContentSource="SelectedContent"/>
+        </Grid>
+    </ControlTemplate>
+
+    <ControlTemplate TargetType="TabControl" x:Key="BottomTemplate">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <TabPanel x:Name="HeaderPanel" Panel.ZIndex="1" KeyboardNavigation.TabIndex="1" Grid.Column="0" IsItemsHost="true"/>
+            </ScrollViewer>
+            <ContentPresenter Grid.Row="0" ContentSource="SelectedContent"/>
+        </Grid>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="LeftTemplate" TargetType="TabControl">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel x:Name="PART_DockPanel" Grid.Column="0" LastChildFill="True">
+                <ScrollViewer x:Name="headerScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Panel.ZIndex="1" DockPanel.Dock="Left">
+                    <TabPanel x:Name="headerPanel" IsItemsHost="true" KeyboardNavigation.TabIndex="1"/>
+                </ScrollViewer>
+            </DockPanel>
+            <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Row="0" Grid.Column="1" ContentSource="SelectedContent"/>
+        </Grid>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="RightTemplate" TargetType="TabControl">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel x:Name="PART_DockPanel" Grid.Column="1" LastChildFill="True">
+                <ScrollViewer x:Name="headerScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Panel.ZIndex="1" DockPanel.Dock="Left">
+                    <TabPanel x:Name="headerPanel" IsItemsHost="true" KeyboardNavigation.TabIndex="1"/>
+                </ScrollViewer>
+            </DockPanel>
+            <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Row="0" Grid.Column="0" ContentSource="SelectedContent"/>
+        </Grid>
+    </ControlTemplate>
+
+    
+
+</ResourceDictionary>
