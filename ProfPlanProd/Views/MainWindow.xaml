@@ -79,6 +79,7 @@
                 <MenuItem Header="Список преподавателей" 
                           FontSize="14" 
                           HorizontalAlignment="Left" 
+                          Command="{Binding ShowTeachersWindowCommand}"
                           />
             </MenuItem>
             <MenuItem Header="Отчеты" HorizontalAlignment="Left" FontSize="16">

@@ -22,6 +22,7 @@ using ProfPlanProd.Commands;
 using ProfPlanProd.Models;
 using ProfPlanProd.ViewModels.Base;
 using static System.Windows.Forms.AxHost;
+using ProfPlanProd.Views;
 
 namespace ProfPlanProd.ViewModels
 {
@@ -1305,6 +1306,37 @@ namespace ProfPlanProd.ViewModels
                 }
             });
         }
+        #endregion
+
+        /// <summary>
+        /// Вкладка Преподаватели
+        /// </summary>
+
+        #region Show Teachers Window
+        private RelayCommand _showTeachersWindowCommand;
+
+        public ICommand ShowTeachersWindowCommand
+        {
+            get { return _showTeachersWindowCommand ?? (_showTeachersWindowCommand = new RelayCommand(ShowTeachersWindow)); }
+        }
+
+        private void ShowTeachersWindow(object obj)
+        {
+            try
+            {
+                var techerswindow = obj as Window;
+
+                TeachersWindow teacherlist = new TeachersWindow();
+                teacherlist.Owner = techerswindow;
+                teacherlist.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                teacherlist.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
         #endregion
     }
 }
