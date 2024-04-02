@@ -1336,7 +1336,46 @@ namespace ProfPlanProd.ViewModels
                 MessageBox.Show(ex.ToString());
             }
         }
+        #endregion
 
+        
+        #region CalcReport
+        private RelayCommand _loadCalcReportPlan;
+        private ReportViewModel loadCalcVM = new ReportViewModel();
+        public ICommand LoadCalcReportPlanCommand
+        {
+            get { return _loadCalcReportPlan ?? (_loadCalcReportPlan = new RelayCommand(CreateLoadCalcReportPlan)); }
+        }
+
+        private void CreateLoadCalcReportPlan(object obj)
+        {
+            try
+            {
+                _=loadCalcVM.CreateLoadCalcAsync(0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private RelayCommand _loadCalcReportFact;
+        public ICommand LoadCalcReportFactCommand
+        {
+            get { return _loadCalcReportFact ?? (_loadCalcReportFact = new RelayCommand(CreateLoadCalcReportFact)); }
+        }
+
+        private void CreateLoadCalcReportFact(object obj)
+        {
+            try
+            {
+                _=loadCalcVM.CreateLoadCalcAsync(1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
         #endregion
     }
 }

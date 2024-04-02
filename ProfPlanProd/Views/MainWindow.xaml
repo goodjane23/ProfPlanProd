@@ -86,7 +86,18 @@
                 <MenuItem Header="Бланки нагрузки" 
                           FontSize="14" 
                           HorizontalAlignment="Left" 
-                          />
+                          >
+
+                    <MenuItem Header="План"
+                              FontSize="14" 
+                              HorizontalAlignment="Left"
+                               Command="{Binding LoadCalcReportPlanCommand}"/>
+
+                    <MenuItem Header="Факт"
+                              FontSize="14" 
+                              HorizontalAlignment="Left"
+                              Command="{Binding LoadCalcReportFactCommand}"/>
+                </MenuItem>
                 <MenuItem Header="Индивидуальные планы" 
                           FontSize="14" 
                           HorizontalAlignment="Left" 

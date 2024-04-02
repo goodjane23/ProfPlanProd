@@ -133,6 +133,21 @@ namespace ProfPlanProd.Models
         {
             return GetEnumerator();
         }
-    
+
+        public void SortExcelDataListByNumber()
+        {
+            List<ExcelModel> sortedList = new List<ExcelModel>();
+            foreach(ExcelModel ex in  _excelDataList)
+            {
+                sortedList.Add(ex);
+            }
+            sortedList.Sort((x, y) => x.Number.CompareTo(y.Number));
+            _excelDataList.Clear();
+            foreach (var item in sortedList)
+            {
+                _excelDataList.Add(item);
+            }
+        }
+
     }
 }
