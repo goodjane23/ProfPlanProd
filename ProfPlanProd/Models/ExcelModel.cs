@@ -106,6 +106,7 @@ namespace ProfPlanProd.Models
             Commercial = commercial;
         }
 
+        public ExcelModel() { }
         public string GetTypeOfWork()
         {
             var properties = new List<(string Name, double? Value)>

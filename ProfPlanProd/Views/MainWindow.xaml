@@ -69,6 +69,11 @@
                           HorizontalAlignment="Left" 
                           Command="{Binding MoveTeachersCommand}"
                           />
+                <MenuItem Header="Добавить строку" 
+                          FontSize="14" 
+                          HorizontalAlignment="Left" 
+                          Command="{Binding AddRowCommand}"
+                          />
                 <MenuItem Header="Сгенерировать листы" 
                           FontSize="14" 
                           HorizontalAlignment="Left" 
@@ -135,6 +140,8 @@ VirtualizingPanel.VirtualizationMode="Recycling"
              </DataTemplate>
         </TabControl.ItemTemplate>
         </TabControl>
+
+        
     </Grid>
 </Window>
  

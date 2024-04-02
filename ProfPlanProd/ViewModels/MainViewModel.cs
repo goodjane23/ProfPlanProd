@@ -776,7 +776,7 @@ namespace ProfPlanProd.ViewModels
                     foreach (var table in tablesCollection)
                     {
                         int rowNumberAutumn = table.ExcelDataList.Count + 6;
-                        int rowNumberSpring = table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 13;
+                        int rowNumberSpring = table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 13;
                         var worksheet = CreateWorksheet(workbook, table);
                         PopulateWorksheet(worksheet, table);
                         if (table.Tablename.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) == -1 && worksheet.Name.IndexOf("ПИиИС", StringComparison.OrdinalIgnoreCase) == -1 && worksheet.Name.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) == -1)
@@ -833,7 +833,7 @@ namespace ProfPlanProd.ViewModels
                         {
 
                             int rowNumberAutumn = TablesCollections.GetTablesCollection()[TablesCollections.GetTableIndexByName(worksheet.Name)].ExcelDataList.Count + 7;
-                            int rowNumberSpring = TablesCollections.GetTablesCollection()[TablesCollections.GetTableIndexByName(worksheet.Name)].ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + rowNumberAutumn + 7;
+                            int rowNumberSpring = TablesCollections.GetTablesCollection()[TablesCollections.GetTableIndexByName(worksheet.Name)].ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + rowNumberAutumn + 7;
 
 
                             for (int i = 0; i < newPropertyNames.Count; i++)
@@ -883,7 +883,7 @@ namespace ProfPlanProd.ViewModels
             {
                 CreateModelHeaders(worksheet);
                 CreateModelHeaders(worksheet, table.ExcelDataList.Count + 7);
-                CreateModelHeaders(worksheet, table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 14);
+                CreateModelHeaders(worksheet, table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 14);
             }
             else
             {
@@ -945,6 +945,19 @@ namespace ProfPlanProd.ViewModels
             int indprop = 27;
             foreach (var data in table.ExcelDataList)
             {
+                if(table.Tablename.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) != -1)
+                {
+                    var value1 = data.GetType().GetProperty("TeacherA")?.GetValue(data, null);
+                    var value2 = data.GetType().GetProperty("TypeOfWork")?.GetValue(data, null);
+                    if (value1 == null && value2 == null)
+                        continue;
+                }
+                if (table.Tablename.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) != -1)
+                {
+                    var value1 = data.GetType().GetProperty("Teacher")?.GetValue(data, null);
+                    if (value1 == null)
+                        continue;
+                }
                 foreach (var propertyName in GetPropertyNames(data))
                 {
                     worksheet.Cell(rowNumber, columnNumber).Style.Border.TopBorder = XLBorderStyleValues.Thin;
@@ -952,7 +965,7 @@ namespace ProfPlanProd.ViewModels
                     worksheet.Cell(rowNumber, columnNumber).Style.Border.RightBorder = XLBorderStyleValues.Thin;
                     worksheet.Cell(rowNumber, columnNumber).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
                     var value = data.GetType().GetProperty(propertyName)?.GetValue(data, null);
-                    if(value != null)
+                    if(value != null && value != "")
                     {
                         if (int.TryParse(value.ToString(), out int val))
                             worksheet.Cell(rowNumber, columnNumber).Value = val;
@@ -986,10 +999,10 @@ namespace ProfPlanProd.ViewModels
                 worksheet.Cell(rowNumber, indprop).Style.Font.SetBold(true);
 
                 rowNumber = table.ExcelDataList.Count() + 8;
-               int  rowNumberCh = table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 15;
+               int  rowNumberCh = table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 15;
                 foreach (var data in table.ExcelDataList)
                 {
-                    if (data.GetTermValue()!="unnull" && data.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1)
+                    if (data.GetTermValue()!="unnull" && (data.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1)
                     {
                         foreach (var propertyName in GetPropertyNames(data))
                         {
@@ -1045,7 +1058,7 @@ namespace ProfPlanProd.ViewModels
                     }
                 }
                 sum=0;
-                foreach (ExcelModel excelModel in table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1))
+                foreach (ExcelModel excelModel in table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1))
                 {
                     sum+=excelModel.Total.ToNullable<double>() ?? 0;
                 }
@@ -1054,7 +1067,7 @@ namespace ProfPlanProd.ViewModels
                 worksheet.Cell(rowNumber, indprop - 2).Style.Font.SetBold(true);
                 worksheet.Cell(rowNumber, indprop).Style.Font.SetBold(true);
                 sum=0;
-                foreach (ExcelModel excelModel in table.ExcelDataList.Where(tc => tc.GetTermValue().IndexOf("нечет", StringComparison.OrdinalIgnoreCase) == -1))
+                foreach (ExcelModel excelModel in table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) == -1))
                 {
                     sum+=excelModel.Total.ToNullable<double>() ?? 0;
                 }
@@ -1096,10 +1109,13 @@ namespace ProfPlanProd.ViewModels
         {
             try
             {
-                if (SelectedTable != null && SelectedComboBoxIndex != -1)
+                if (MessageBox.Show($"Вы уверены, что хотите очистить таблицу {SelectedTable.Tablename}?", "Очистка таблицы", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    TablesCollections.RemoveTableAtIndex(TablesCollections.GetTableIndexByName(SelectedTable.Tablename, SelectedComboBoxIndex));
-                    UpdateListBoxItemsSource();
+                    if (SelectedTable != null && SelectedComboBoxIndex != -1)
+                    {
+                        TablesCollections.RemoveTableAtIndex(TablesCollections.GetTableIndexByName(SelectedTable.Tablename, SelectedComboBoxIndex));
+                        UpdateListBoxItemsSource();
+                    }
                 }
             }
             catch (Exception ex)
@@ -1207,6 +1223,35 @@ namespace ProfPlanProd.ViewModels
         }
         #endregion
 
+
+        #region AddRow
+        private RelayCommand _addRow;
+
+        public ICommand AddRowCommand
+        {
+            get { return _addRow ?? (_addRow = new RelayCommand(AddRow)); }
+        }
+        private void AddRow(object parameter)
+        {
+            if(SelectedTable != null)
+            {
+                if (SelectedTable.Tablename.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) != -1)
+                {
+                    SelectedTable.ExcelDataList.Add(new ExcelTotal());
+                }
+                else if (SelectedTable.Tablename.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) != -1)
+                {
+                    SelectedTable.ExcelDataList.Add(new ExcelAdditional());
+                }
+                else
+                {
+                    MessageBox.Show("В данную таблицу нельзя добавить запись!");
+                }
+            }
+        }
+        #endregion
+
+        
 
         #region Generate Teachers lists
         private RelayCommand _generateTeachersLists;
