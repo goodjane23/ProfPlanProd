@@ -23,6 +23,7 @@ using ProfPlanProd.Models;
 using ProfPlanProd.ViewModels.Base;
 using static System.Windows.Forms.AxHost;
 using ProfPlanProd.Views;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
 namespace ProfPlanProd.ViewModels
 {
@@ -780,6 +781,7 @@ namespace ProfPlanProd.ViewModels
                         PopulateWorksheet(worksheet, table);
                         if (table.Tablename.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) == -1 && worksheet.Name.IndexOf("ПИиИС", StringComparison.OrdinalIgnoreCase) == -1 && worksheet.Name.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) == -1)
                         {
+                            worksheet.Range(1, 2, 1, 3).Merge();
                             worksheet.Cell(1, 2).Value = worksheet.Cell(3, 2).Value;
                             worksheet.Cell(1, 2).Style.Font.SetFontSize(14);
                             worksheet.Cell(1, 2).Style.Font.SetBold(true);
@@ -858,7 +860,9 @@ namespace ProfPlanProd.ViewModels
                         if (worksheet.Name.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) == -1)
                         {
 
-                            worksheet.Columns(2, 3).AdjustToContents(4, 4);
+                            worksheet.Column(3).AdjustToContents(4, 4);
+                            worksheet.Column(2).AdjustToContents(4, 4);
+                            worksheet.Row(2).AdjustToContents(20, 20);
                             //worksheet.Rows().AdjustToContents();
                         }
                     }
@@ -1370,6 +1374,28 @@ namespace ProfPlanProd.ViewModels
             try
             {
                 _=loadCalcVM.CreateLoadCalcAsync(1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        #endregion
+
+
+        #region Individual Plan report
+        private RelayCommand _individualPlanReport;
+
+        public ICommand LoadIndividualPlanReportCommmand
+        {
+            get { return _individualPlanReport ?? (_individualPlanReport = new RelayCommand(CreateIndividualPlanReport)); }
+        }
+
+        private void CreateIndividualPlanReport(object obj)
+        {
+            try
+            {
+                loadCalcVM.CreateIndividualPlan(SelectedComboBoxIndex);
             }
             catch (Exception ex)
             {

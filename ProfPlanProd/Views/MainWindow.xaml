@@ -101,6 +101,7 @@
                 <MenuItem Header="Индивидуальные планы" 
                           FontSize="14" 
                           HorizontalAlignment="Left" 
+                          Command="{Binding LoadIndividualPlanReportCommmand}"
                           />
             </MenuItem>
             <MenuItem Header="Настройки" HorizontalAlignment="Left" FontSize="16" >
