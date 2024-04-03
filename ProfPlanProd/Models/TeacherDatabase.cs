@@ -5,6 +5,8 @@ using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -33,6 +35,13 @@ namespace ProfPlanProd.Models
             {
                 SQLiteConnection.CreateFile(dbFileName);
             }
+            FileInfo fileInfo = new FileInfo(dbFileName);
+            FileSecurity fileSecurity = fileInfo.GetAccessControl();
+            fileSecurity.AddAccessRule(new FileSystemAccessRule(
+                new SecurityIdentifier(WellKnownSidType.WorldSid, null),
+                FileSystemRights.FullControl,
+                AccessControlType.Allow));
+            fileInfo.SetAccessControl(fileSecurity);
             m_dbConn = new SQLiteConnection("Data Source=" + dbFileName + ";Version=3;");
             m_dbConn.Open();
             m_sqlCmd.Connection = m_dbConn;
