@@ -29,7 +29,16 @@ namespace ProfPlanProd.ViewModels
 {
     internal class MainViewModel : ViewModel
     {
-        public MainViewModel() { }
+        public MainViewModel() 
+        {
+            ExcelModel.UpdateSharedTeachers();
+            loadCalcVM.StateChanged += Model2_StateChanged;
+        }
+
+        private void Model2_StateChanged(object sender, EventArgs e)
+        {
+            State = loadCalcVM.State;
+        }
 
         private string filePath = "";
         private string tempFilePath = "";
@@ -54,12 +63,18 @@ namespace ProfPlanProd.ViewModels
                 filePath = GetExcelFilePath();
                 if (!string.IsNullOrEmpty(filePath))
                 {
-                     tableCollection = ReadExcelData(filePath).Tables;
+                    int completedTables = 0;
+                    int totalTables;
+                    tableCollection = ReadExcelData(filePath).Tables;
                 TablesCollections.Clear();
                 foreach (DataTable table in tableCollection)
                 {
-                    ProcessDataTable(table);
-                }
+                        totalTables = tableCollection.Count;
+                        ProcessDataTable(table);
+                        completedTables++;
+                        double progress = (double)completedTables / totalTables * 100;
+                        State = (double)progress;
+                    }
                 }
                 UpdateListBoxItemsSource();
             }
@@ -348,6 +363,8 @@ namespace ProfPlanProd.ViewModels
                 tempFilePath = GetExcelFilePath();
                 if (!string.IsNullOrEmpty(tempFilePath))
                 {
+                    int completedTables = 0;
+                    int totalTables;
                     tableCollection = ReadExcelData(tempFilePath).Tables;
 
                     if (tableCollection.Count == 1)
@@ -356,9 +373,13 @@ namespace ProfPlanProd.ViewModels
                             tableCollection[0].TableName = "П_ПИиИС";
                         else if (_selectedComboBoxIndex == 1)
                             tableCollection[0].TableName = "Ф_ПИиИС";
+                        totalTables = tableCollection.Count;
                         foreach (DataTable table in tableCollection)
                         {
                             DataTableInsert(table);
+                            completedTables++;
+                            double progress = (double)completedTables / totalTables * 100;
+                            State = (double)progress;
                         }
                         OnPropertyChanged(nameof(TablesCollections));
                         UpdateListBoxItemsSource();
@@ -773,6 +794,8 @@ namespace ProfPlanProd.ViewModels
             {
                 using (var workbook = new XLWorkbook())
                 {
+                    int completedTables = 0;
+                    int totalTables = tablesCollection.Count;
                     foreach (var table in tablesCollection)
                     {
                         int rowNumberAutumn = table.ExcelDataList.Count + 6;
@@ -798,6 +821,10 @@ namespace ProfPlanProd.ViewModels
                             worksheet.Cell(rowNumberSpring, 2).Style.Font.SetFontSize(14);
                             worksheet.Cell(rowNumberSpring, 2).Style.Font.SetBold(true);
                         }
+                        completedTables++;
+                        double progress = (double)completedTables / totalTables * 40;
+
+                        State = (double)progress;
                     }
                     int frow = 2;
                     List<string> newPropertyNames = new List<string>
@@ -813,6 +840,8 @@ namespace ProfPlanProd.ViewModels
                 {
                     "ФИО", "Вид работы", "Часов"
                 };
+                    completedTables = 0;
+                    totalTables = workbook.Worksheets.Count;
                     foreach (var worksheet in workbook.Worksheets)
                     {
                         if (worksheet.Name.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) != -1)
@@ -854,7 +883,13 @@ namespace ProfPlanProd.ViewModels
                                 worksheet.Cell(rowNumberSpring, i + 1).Style.Alignment.WrapText = true;
                             }
                         }
+                        completedTables++;
+                        double progress = (double)completedTables / totalTables * 40;
+
+                        State =  (double)progress + 40;
                     }
+                    totalTables = workbook.Worksheets.Count();
+                    completedTables = 0;
                     foreach (var worksheet in workbook.Worksheets)
                     {
                         if (worksheet.Name.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) == -1)
@@ -865,6 +900,10 @@ namespace ProfPlanProd.ViewModels
                             worksheet.Row(2).AdjustToContents(20, 20);
                             //worksheet.Rows().AdjustToContents();
                         }
+                        completedTables++;
+                        double progress = (double)completedTables / totalTables * 20;
+
+                        State =  (double)progress + 80;
                     }
                     SaveWorkbook(workbook);
                 }
@@ -1146,6 +1185,8 @@ namespace ProfPlanProd.ViewModels
                     {
                         if (TablesCollections.GetTablesCollection()[stableindex].ExcelDataList.Count != 0)
                         {
+                            int completedTables = 0;
+                            int totalTables = TablesCollections.GetTablesCollection()[stableindex].ExcelDataList.Count;
                             for (int i = 0; i < TablesCollections.GetTablesCollection()[stableindex].ExcelDataList.Count; i++)
                             {
                                 if (TablesCollections.GetTablesCollection()[stableindex].ExcelDataList[i] is ExcelModel excelModel && excelModel.Teacher == "")
@@ -1163,6 +1204,10 @@ namespace ProfPlanProd.ViewModels
                                         stableData.Teacher = ftableData.Teacher;
                                     }
                                 }
+                                completedTables++;
+                                double progress = (double)completedTables / totalTables * 100;
+
+                                State =  (double)progress;
                             }
                         }
                         else
@@ -1171,10 +1216,16 @@ namespace ProfPlanProd.ViewModels
                             CreateTableCollectionsForMove();
                             ftableindex = TablesCollections.GetTableIndexByName("П_ПИиИС", SelectedComboBoxIndex);
                             stableindex = TablesCollections.GetTableIndexByName("Ф_ПИиИС", SelectedComboBoxIndex);
+                            int completedTables = 0;
+                            int totalTables = TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList.Count;
                             for (int i = 0; i < TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList.Count; i++)
                             {
                                 ExcelModel ftableData = TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList[i] as ExcelModel;
                                 TablesCollections.AddByIndex(stableindex, ftableData);
+                                completedTables++;
+                                double progress = (double)completedTables / totalTables * 100;
+
+                                State =  (double)progress;
                             }
                         }
 
@@ -1190,10 +1241,16 @@ namespace ProfPlanProd.ViewModels
                     CreateTableCollectionsForMove();
                     ftableindex = TablesCollections.GetTableIndexByName("П_ПИиИС", SelectedComboBoxIndex);
                     stableindex = TablesCollections.GetTableIndexByName("Ф_ПИиИС", SelectedComboBoxIndex);
+                    int completedTables = 0;
+                    int totalTables = TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList.Count;
                     for (int i = 0; i < TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList.Count; i++)
                     {
                         ExcelModel ftableData = TablesCollections.GetTablesCollection()[ftableindex].ExcelDataList[i] as ExcelModel;
                         TablesCollections.AddByIndex(stableindex, ftableData);
+                        completedTables++;
+                        double progress = (double)completedTables / totalTables * 100;
+
+                        State =  (double)progress;
                     }
                 }
                 if (SelectedComboBoxIndex==0 && TablesCollections.GetTablesCollectionWithP().Count()>0)
@@ -1294,6 +1351,8 @@ namespace ProfPlanProd.ViewModels
                    .Distinct()
                    .ToList();
                     ObservableCollection<ExcelData> totallist = new ObservableCollection<ExcelData>();
+                    int completedTables = 0;
+                    int totalTables = uniqueTeachers.Count;
                     foreach (var teacher in uniqueTeachers)
                     {
                         var teacherTableCollection = new TableCollection() { };
@@ -1342,11 +1401,21 @@ namespace ProfPlanProd.ViewModels
                                 );
 
                         }
+                        completedTables++;
+                        double progress = (double)completedTables / totalTables * 80;
+
+                        State =  (double)progress;
                     }
                     string tabname = prefix + "Итого";
+                    completedTables = 0;
+                    totalTables = totallist.Count;
                     foreach (ExcelTotal list in totallist)
                     {
                         list.DifferenceCalc();
+                        completedTables++;
+                        double progress = (double)completedTables / totalTables * 20;
+
+                        State =  (double)progress + 80;
                     }
                     TablesCollections.Add(new TableCollection(tabname, totallist));
                     TablesCollections.Add(new TableCollection("Доп", new ObservableCollection<ExcelData>() { new ExcelAdditional() }));
@@ -1440,7 +1509,7 @@ namespace ProfPlanProd.ViewModels
         {
             try
             {
-                loadCalcVM.CreateIndividualPlan(SelectedComboBoxIndex);
+                _=loadCalcVM.CreateIndividualPlan(SelectedComboBoxIndex);
             }
             catch (Exception ex)
             {
@@ -1448,5 +1517,38 @@ namespace ProfPlanProd.ViewModels
             }
         }
         #endregion
+
+        //State
+        private DateTime _lastState100Time;
+        private readonly TimeSpan _resetDelay = TimeSpan.FromSeconds(10);
+        private readonly object _lock = new object();
+
+        private double _state;
+        public double State
+        {
+            get { return _state; }
+            set
+            {
+                if (_state != value)
+                {
+                    _state = value;
+                    OnPropertyChanged(nameof(State));
+                    if (_state == 100)
+                    {
+                        lock (_lock)
+                        {
+                            _lastState100Time = DateTime.Now;
+                            Task.Delay(_resetDelay).ContinueWith(task =>
+                            {
+                                if (DateTime.Now - _lastState100Time >= _resetDelay)
+                                {
+                                    State = 0;
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
     }
 }

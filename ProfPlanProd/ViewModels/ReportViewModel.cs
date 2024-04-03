@@ -24,10 +24,29 @@ namespace ProfPlanProd.ViewModels
         public ObservableCollection<TableCollection> TablesCollectionTeacherSumF { get; set; }
         private ObservableCollection<TableCollection> TablesCollectionTeacherSumListF { get; set; }
         private ObservableCollection<TableCollection> TablesCollectionTeacherForCheck { get; set; }
-        
+
         /// <summary>
         /// Бланк нагрузки
         /// </summary>
+        private double _state;
+        public double State
+        {
+            get { return _state; }
+            set
+            {
+                if (_state != value)
+                {
+                    _state = value;
+                    OnPropertyChanged(nameof(State));
+                    OnStateChanged();
+                }
+            }
+        }
+        protected virtual void OnStateChanged()
+        {
+            StateChanged?.Invoke(this, EventArgs.Empty);
+        }
+        public event EventHandler StateChanged;
 
         #region LoadCalc
         public async Task CreateLoadCalcAsync(int index)
@@ -105,6 +124,8 @@ namespace ProfPlanProd.ViewModels
             }
             TablesCollectionTeacherForCheck = new ObservableCollection<TableCollection>();
             TablesCollections.SortTablesCollection();
+            int completedTables = 0;
+            int totalTables = TablesCollections.GetTablesCollection().Count();
             foreach (var tableCollection in TablesCollections.GetTablesCollection())
             {
                 if (tableCollection.Tablename.IndexOf("ПИиИС", StringComparison.OrdinalIgnoreCase) == -1 && tableCollection.Tablename.IndexOf("Итого", StringComparison.OrdinalIgnoreCase) == -1 && tableCollection.Tablename.IndexOf("Незаполненные", StringComparison.OrdinalIgnoreCase) == -1 && tableCollection.Tablename.IndexOf("Доп", StringComparison.OrdinalIgnoreCase) == -1)
@@ -208,6 +229,10 @@ namespace ProfPlanProd.ViewModels
 
                     }
                 }
+                completedTables++;
+                double progress = (double)completedTables / totalTables * 60;
+
+                State = (double)progress;
             }
 
         }
@@ -415,6 +440,8 @@ namespace ProfPlanProd.ViewModels
 
                 // Заполнение данных - первые элементы
                 int rowNumber = 4;
+                int completedTables = 0;
+                int totalTables = tablesCollection.Count;
                 foreach (var tableCollection in tablesCollection)
                 {
                     string teacherName = CreateTeachersNameForForm(tableCollection.Tablename);
@@ -437,6 +464,10 @@ namespace ProfPlanProd.ViewModels
 
                         rowNumber++;
                     }
+                    completedTables++;
+                    double progress = (double)completedTables / totalTables * 20;
+
+                    State = (double)progress + 60;
                 }
 
                 //// Дублирую колонки
@@ -671,7 +702,8 @@ namespace ProfPlanProd.ViewModels
         //addSave
         private  void SaveToExcelAdditionalLists(ObservableCollection<TableCollection> tablesCollection, XLWorkbook workbook)
         {
-            
+            int completedTables = 0;
+            int totalTables = tablesCollection.Count;
                     foreach (var table in tablesCollection)
                     {
                         table.SortExcelDataListByNumber();
@@ -684,7 +716,11 @@ namespace ProfPlanProd.ViewModels
                             worksheet.Cell(1, 2).Style.Font.SetFontSize(14);
                             worksheet.Cell(1, 2).Style.Font.SetBold(true);
                         }
-                    }
+                completedTables++;
+                double progress = (double)completedTables / totalTables * 20;
+
+                State = (double)progress + 80;
+            }
                     int frow = 2;
                     List<string> newPropertyNames = new List<string>
                 {
@@ -805,7 +841,7 @@ namespace ProfPlanProd.ViewModels
 
         private ObservableCollection<List<IndividualPlan>> IPListP = new ObservableCollection<List<IndividualPlan>>(), IPListF = new ObservableCollection<List<IndividualPlan>>();
 
-        public void CreateIndividualPlan(int index)
+        public async Task CreateIndividualPlan(int index)
         {
             try
             {
@@ -814,8 +850,8 @@ namespace ProfPlanProd.ViewModels
                 string directoryPath = GetSaveFilePathForIP();
                 if (string.IsNullOrEmpty(directoryPath))
                     return;
-                //await Task.Run(() =>
-                //{
+                await Task.Run(() =>
+                {
 
                     bool hasTablesP = false, hasTablesF = false;
                     hasTablesP = TablesCollections.GetTableByName("П_ПИиИС", 0);
@@ -855,7 +891,8 @@ namespace ProfPlanProd.ViewModels
                         SomeTab = TablesCollectionTeacherSumListF;
                     else
                         SomeTab = TablesCollectionTeacherSumListP;
-                   
+                    int completedTables = 0;
+                    int totalTables = SomeTab.Count;
                     for (int i = 0; i< SomeTab.Count; i++)
                     {
                         int row = 1;
@@ -973,8 +1010,12 @@ namespace ProfPlanProd.ViewModels
 
                             WorkWithWorkSheet(worksheet, IPListP[i]);
                         }
+                        completedTables++;
+                        double progress = (double)completedTables / totalTables * 100;
+
+                        State = (double)progress;
                     }
-                //});
+                });
 
 
                 workbook.SaveAs(directoryPath);

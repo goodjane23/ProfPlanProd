@@ -175,6 +175,7 @@
 
                 <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" />-->
             </ResourceDictionary.MergedDictionaries>
+            <views:StateToVisibilityConverter x:Key="StateToVisibilityConverter"/>
             <views:MyContentTemplateSelector x:Key="MyContentTemplateSelector"
                 FirstTemplate="{StaticResource FirstTemplate}" 
                 SecondTemplate="{StaticResource SecondTemplate}"

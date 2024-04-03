@@ -141,7 +141,17 @@ VirtualizingPanel.VirtualizationMode="Recycling"
         </TabControl.ItemTemplate>
         </TabControl>
 
-        
+        <StatusBar Grid.Row="2" Grid.Column="0">
+            <StatusBarItem HorizontalAlignment="Left">
+                <Grid Visibility="{Binding State, Converter={StaticResource StateToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                    <!-- Прогресс-бар -->
+                    <ProgressBar x:Name="Status" Background="Gray" Width="200" Height="15" Value="{Binding State}" Minimum="0" Maximum="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <!-- Текстовый блок для отображения числового значения -->
+                    <TextBlock Foreground="White" Text="{Binding ElementName=Status, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>
  
