@@ -141,7 +141,7 @@
         </TabControl.ItemTemplate>
         </TabControl>
 
-        <StatusBar Grid.Row="2" Grid.Column="0">
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="2">
             <StatusBarItem HorizontalAlignment="Left">
                 <Grid Visibility="{Binding State, Converter={StaticResource StateToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
                     <!-- Прогресс-бар -->
@@ -150,6 +150,9 @@
                     <!-- Текстовый блок для отображения числового значения -->
                     <TextBlock Foreground="White" Text="{Binding ElementName=Status, Path=Value, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Grid>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Foreground="Black" Text="{Binding StringsCount}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>

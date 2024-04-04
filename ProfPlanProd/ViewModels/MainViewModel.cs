@@ -610,6 +610,10 @@ namespace ProfPlanProd.ViewModels
                 {
                     _selectedTable = value;
                     OnPropertyChanged(nameof(SelectedTable));
+                    if(value!=null)
+                        StringsCount = $"Строк {SelectedTable.ExcelDataList.Count}";
+                    else
+                        StringsCount = $"";
                 }
             }
         }
@@ -1547,6 +1551,20 @@ namespace ProfPlanProd.ViewModels
                             });
                         }
                     }
+                }
+            }
+        }
+
+        private string _stringsCount;
+        public string StringsCount
+        {
+            get { return _stringsCount; }
+            set
+            {
+                if (_stringsCount != value)
+                {
+                    _stringsCount = value;
+                    OnPropertyChanged(nameof(StringsCount));
                 }
             }
         }

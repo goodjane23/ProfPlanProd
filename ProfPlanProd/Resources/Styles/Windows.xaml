@@ -22,7 +22,7 @@
             </DataGrid.CellStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№" Binding="{Binding Number}" IsReadOnly="True" dgv:DataGridFilterColumn.IsFilterVisible="False"/>
-                <DataGridTemplateColumn Header="Преподаватель" dgv:DataGridFilterColumn.IsFilterVisible="False">
+                <DataGridTemplateColumn Header="Преподаватель" dgv:DataGridFilterColumn.Template="{StaticResource MultipleChoiceFilter}" SortMemberPath="Teacher" >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ComboBox IsEditable="True" 
