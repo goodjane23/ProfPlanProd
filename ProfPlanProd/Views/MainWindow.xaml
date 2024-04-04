@@ -127,12 +127,12 @@
         ItemsSource="{Binding DisplayedTables}"
         ContentTemplateSelector="{StaticResource MyContentTemplateSelector}" 
         SelectedItem="{Binding SelectedTable, Mode=TwoWay}"
-                    TabStripPlacement="{Binding TabStripPlacement, Mode=TwoWay}"
-                            VirtualizingPanel.IsVirtualizing="True"
-VirtualizingPanel.VirtualizationMode="Recycling"
+        TabStripPlacement="{Binding TabStripPlacement, Mode=TwoWay}"
+        VirtualizingPanel.IsVirtualizing="True"
+        VirtualizingPanel.VirtualizationMode="Recycling"
         VirtualizingPanel.CacheLength="25" 
         VirtualizingPanel.CacheLengthUnit="Item"
-                    Template="{Binding TabStripPlacement, Converter={StaticResource TabStripPlacementConverter}}" Cursor="">
+        Template="{Binding TabStripPlacement, Converter={StaticResource TabStripPlacementConverter}}" Cursor="">
 
         <TabControl.ItemTemplate>
              <DataTemplate>
