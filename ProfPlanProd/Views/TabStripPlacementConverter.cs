@@ -17,27 +17,21 @@ namespace ProfPlanProd.Views
         public ControlTemplate RightTemplate { get; set; }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Dock dockValue)
+            var dockValue = (Dock)value;
+            
+            switch (dockValue)
             {
-                if (dockValue == Dock.Top)
-                {
-                    return TopTemplate;
-                }
-                else if (dockValue == Dock.Bottom)
-                {
-                    return BottomTemplate;
-                }
-                else if (dockValue == Dock.Left)
-                {
-                    return LeftTemplate;
-                }
-                else
-                {
+                case Dock.Left:
+                    return LeftTemplate;                   
+                case Dock.Top:
+                    return TopTemplate;                    
+                case Dock.Right:
                     return RightTemplate;
-                }
+                case Dock.Bottom:
+                    return BottomTemplate;
+                default:
+                    return RightTemplate;
             }
-
-            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

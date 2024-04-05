@@ -15,14 +15,12 @@ namespace ProfPlanProd.Models
 {
     internal class TeacherDatabase
     {
-        private string connectionString;
-
         public TeacherDatabase()
         {
             InitializeDatabase();
         }
 
-        private String dbFileName;
+        private string dbFileName;
         private SQLiteConnection m_dbConn;
         private SQLiteCommand m_sqlCmd;
         // Метод для инициализации базы данных и создания таблицы, если она не существует
@@ -62,7 +60,6 @@ namespace ProfPlanProd.Models
         // Метод для сохранения данных учителя в базу данных
         public void SaveTeachers(ObservableCollection<Teacher> teachers)
         {
-
             if (m_dbConn.State != ConnectionState.Open)
             {
                 MessageBox.Show("Open connection with database");
@@ -72,7 +69,6 @@ namespace ProfPlanProd.Models
             m_sqlCmd.ExecuteNonQuery();
             foreach (var teacher in teachers)
             {
-
                 m_sqlCmd.CommandText = @"
                         INSERT INTO Teachers (LastName, FirstName, MiddleName, Position, AcademicDegree, Workload)
                         VALUES ($lastName, $firstName, $middleName, $position, $academicDegree, $workload);";

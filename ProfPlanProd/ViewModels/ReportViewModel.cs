@@ -1,19 +1,14 @@
 ﻿using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 using ProfPlanProd.Models;
 using ProfPlanProd.ViewModels.Base;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using static System.Windows.Forms.AxHost;
 
 namespace ProfPlanProd.ViewModels
 {
@@ -1180,7 +1175,6 @@ namespace ProfPlanProd.ViewModels
 
         private void CreateTotal(List<IndividualPlan> IPList, int index, int r, ref int row, IXLWorksheet worksheet, int col1, int col2, int col3)
         {
-            int ind;
             var evenTermList = IPList.Where(ip => ip.Term == "чет").ToList();
             var oddTermList = IPList.Where(ip => ip.Term == "нечет").ToList();
 

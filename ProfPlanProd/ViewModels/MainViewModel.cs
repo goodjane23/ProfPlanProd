@@ -6,22 +6,16 @@ using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ClosedXML.Excel;
-using ControlzEx.Standard;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Spreadsheet;
 using ExcelDataReader;
 using Microsoft.Win32;
 using ProfPlanProd.Commands;
 using ProfPlanProd.Models;
 using ProfPlanProd.ViewModels.Base;
-using static System.Windows.Forms.AxHost;
 using ProfPlanProd.Views;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
@@ -48,13 +42,13 @@ namespace ProfPlanProd.ViewModels
         /// Вкладка Файл 
         /// </summary>
         #region OpenFileCommand
+
         private RelayCommand _loadDataCommand;
 
         public ICommand LoadDataCommand
         {
             get { return _loadDataCommand ?? (_loadDataCommand = new RelayCommand(LoadDataToTablesCollection)); }
         }
-
 
         private void LoadDataToTablesCollection(object parameter)
         {
@@ -90,7 +84,6 @@ namespace ProfPlanProd.ViewModels
 
             return openFileDialog.ShowDialog() == true ? openFileDialog.FileName : null;
         }
-
 
         private DataSet ReadExcelData(string filePath)
         {
@@ -128,7 +121,7 @@ namespace ProfPlanProd.ViewModels
             }
 
             for (int i = 0; i < table.Rows.Count; i++)
-            {
+            {                
                 for (int j = 0; j < table.Columns.Count - 1; j++)
                 {
                     if (table.Rows[i][j].ToString().Trim() == "Дисциплина")
@@ -139,12 +132,12 @@ namespace ProfPlanProd.ViewModels
                         break;
                     }
                 }
-
                 if (exitOuterLoop)
                 {
                     break;
                 }
             }
+
             if (rowIndex != -1)
             {
                 for (int i = rowIndex; i < table.Rows.Count; i++)
@@ -348,13 +341,13 @@ namespace ProfPlanProd.ViewModels
         #endregion
 
         #region AddTable
+
         private RelayCommand _addDataCommand;
 
         public ICommand AddDataCommand
         {
             get { return _addDataCommand ?? (_addDataCommand = new RelayCommand(AddData)); }
         }
-
 
         private void AddData(object parameter)
         {
@@ -415,6 +408,7 @@ namespace ProfPlanProd.ViewModels
             ObservableCollection<ExcelData> list = new ObservableCollection<ExcelData>();
             int rowIndex = -1;
             bool haveTeacher = false;
+
             for (int i = 0; i < table.Rows.Count; i++)
             {
                 for (int j = 0; j < table.Columns.Count - 1; j++)
@@ -553,6 +547,7 @@ namespace ProfPlanProd.ViewModels
         #endregion
 
         #region Settings and Interaction
+
         private int _selectedComboBoxIndex;
         private ObservableCollection<TableCollection> _displayedTables;
         private TableCollection _selectedTable;
@@ -654,7 +649,6 @@ namespace ProfPlanProd.ViewModels
         private void SelectTabItemsPlacement(object parameter)
         {
             SelectTabItemsPlacementAsync();
-
         }
         private async Task SelectTabItemsPlacementAsync()
         {
@@ -690,27 +684,29 @@ namespace ProfPlanProd.ViewModels
         #endregion
 
         #region Exit
-        private RelayCommand _exitCommand;
 
+        private RelayCommand _exitCommand;
         public ICommand ExitCommand
         {
             get { return _exitCommand ?? (_exitCommand = new RelayCommand(ExitFromApp)); }
         }
 
-
         private void ExitFromApp(object parameter)
         {
             Application.Current.Dispatcher.Invoke(() => Application.Current.Shutdown());
         }
+
         #endregion
 
         #region Create BaseTable
+
         private RelayCommand _createBaseTableCommand;
 
         public ICommand CreateBaseTableCommand
         {
             get { return _createBaseTableCommand ?? (_createBaseTableCommand = new RelayCommand(CreateBaseTable)); }
         }
+
         private void CreateBaseTable(object parameter)
         {
             try
@@ -722,6 +718,7 @@ namespace ProfPlanProd.ViewModels
                 MessageBox.Show(ex.ToString());
             }
         }
+
         private async Task CreateTableCollection()
         {
             await Task.Run(() =>
@@ -737,9 +734,11 @@ namespace ProfPlanProd.ViewModels
             });
 
         }
+
         #endregion
 
         #region Save
+
         private RelayCommand _saveDataToExcelAs;
         private RelayCommand _saveDataToExcel;
 
@@ -783,13 +782,10 @@ namespace ProfPlanProd.ViewModels
             if (result == System.Windows.Forms.DialogResult.OK)
             {
                 filePath = saveFileDialog.FileName;
+                SaveToExcelAsync();
+            }
 
-            }
-            else
-            {
-                return;
-            }
-            SaveToExcelAsync();
+            return;
         }
 
         private async Task SaveToExcels(ObservableCollection<TableCollection> tablesCollection)
@@ -1034,7 +1030,7 @@ namespace ProfPlanProd.ViewModels
                 double sum = 0;
                 foreach (ExcelModel excelModel in table.ExcelDataList)
                 {
-                    sum+=excelModel.Total.ToNullable<double>() ?? 0;
+                    sum += excelModel.Total.ToNullable<double>() ?? 0;
                 }
                 worksheet.Cell(rowNumber, indprop - 2).Value = "Итого";
                 worksheet.Cell(rowNumber, indprop).Value = sum;
@@ -1042,7 +1038,7 @@ namespace ProfPlanProd.ViewModels
                 worksheet.Cell(rowNumber, indprop).Style.Font.SetBold(true);
 
                 rowNumber = table.ExcelDataList.Count() + 8;
-               int  rowNumberCh = table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 15;
+                int rowNumberCh = table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1).Count() + table.ExcelDataList.Count() + 15;
                 foreach (var data in table.ExcelDataList)
                 {
                     if (data.GetTermValue()!="unnull" && (data.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1)
@@ -1069,6 +1065,7 @@ namespace ProfPlanProd.ViewModels
                             }
                             columnNumber++;
                         }
+
                         rowNumber++;
                         columnNumber = 1;
                     }
@@ -1092,7 +1089,7 @@ namespace ProfPlanProd.ViewModels
                             }
                             else
                             {
-                                worksheet.Cell(rowNumberCh, columnNumber).Value ="";
+                                worksheet.Cell(rowNumberCh, columnNumber).Value = "";
                             }
                             columnNumber++;
                         }
@@ -1100,26 +1097,32 @@ namespace ProfPlanProd.ViewModels
                         columnNumber = 1;
                     }
                 }
-                sum=0;
-                foreach (ExcelModel excelModel in table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1))
-                {
-                    sum+=excelModel.Total.ToNullable<double>() ?? 0;
-                }
+
+                var even = table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) != -1);
+                var odd = table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) == -1);
+                
+                sum = GetSum(even);               
                 worksheet.Cell(rowNumber, indprop - 2).Value = "Итого";
                 worksheet.Cell(rowNumber, indprop).Value = sum;
                 worksheet.Cell(rowNumber, indprop - 2).Style.Font.SetBold(true);
                 worksheet.Cell(rowNumber, indprop).Style.Font.SetBold(true);
-                sum=0;
-                foreach (ExcelModel excelModel in table.ExcelDataList.Where(tc => (tc.GetTermValue() ?? "").IndexOf("нечет", StringComparison.OrdinalIgnoreCase) == -1))
-                {
-                    sum+=excelModel.Total.ToNullable<double>() ?? 0;
-                }
+
+                sum = GetSum(odd);
                 worksheet.Cell(rowNumberCh, indprop - 2).Value = "Итого";
                 worksheet.Cell(rowNumberCh, indprop).Value = sum;
                 worksheet.Cell(rowNumberCh, indprop - 2).Style.Font.SetBold(true);
                 worksheet.Cell(rowNumberCh, indprop).Style.Font.SetBold(true);
             }
+        }
 
+        private double GetSum(IEnumerable collection)
+        {
+            double sum = 0;
+            foreach (ExcelModel excelModel in collection)
+            {
+                sum += excelModel.Total.ToNullable<double>() ?? 0;
+            }
+            return sum;
         }
 
         private IEnumerable<string> GetPropertyNames(object data)
@@ -1135,6 +1138,7 @@ namespace ProfPlanProd.ViewModels
         {
             workbook.SaveAs(filePath);
         }
+
         #endregion
 
         /// <summary>
@@ -1142,12 +1146,14 @@ namespace ProfPlanProd.ViewModels
         /// </summary>
 
         #region Clear table
+
         private RelayCommand _clearTableCommand;
 
         public ICommand ClearTableCommand
         {
             get { return _clearTableCommand ?? (_clearTableCommand = new RelayCommand(ClearTable)); }
         }
+
         private void ClearTable(object parameter)
         {
             try
@@ -1166,10 +1172,11 @@ namespace ProfPlanProd.ViewModels
                 MessageBox.Show(ex.ToString());
             }
         }
+
         #endregion
 
-
         #region Move Teachers from Plan to Fact
+
         private RelayCommand _moveTeachersCommand;
 
         public ICommand MoveTeachersCommand
@@ -1284,8 +1291,8 @@ namespace ProfPlanProd.ViewModels
         }
         #endregion
 
-
         #region AddRow
+
         private RelayCommand _addRow;
 
         public ICommand AddRowCommand
@@ -1312,9 +1319,8 @@ namespace ProfPlanProd.ViewModels
         }
         #endregion
 
-        
-
         #region Generate Teachers lists
+        
         private RelayCommand _generateTeachersLists;
 
         public ICommand GenerateTeachersListsCommand
@@ -1428,6 +1434,7 @@ namespace ProfPlanProd.ViewModels
                 }
             });
         }
+
         #endregion
 
         /// <summary>
@@ -1435,6 +1442,7 @@ namespace ProfPlanProd.ViewModels
         /// </summary>
 
         #region Show Teachers Window
+
         private RelayCommand _showTeachersWindowCommand;
 
         public ICommand ShowTeachersWindowCommand
@@ -1459,9 +1467,9 @@ namespace ProfPlanProd.ViewModels
             }
         }
         #endregion
-
         
         #region CalcReport
+
         private RelayCommand _loadCalcReportPlan;
         private ReportViewModel loadCalcVM = new ReportViewModel();
         public ICommand LoadCalcReportPlanCommand
@@ -1498,10 +1506,11 @@ namespace ProfPlanProd.ViewModels
                 MessageBox.Show(ex.ToString());
             }
         }
+
         #endregion
 
-
         #region Individual Plan report
+
         private RelayCommand _individualPlanReport;
 
         public ICommand LoadIndividualPlanReportCommmand
